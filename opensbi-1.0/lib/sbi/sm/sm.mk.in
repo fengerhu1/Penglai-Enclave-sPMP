@@ -1,5 +1,6 @@
 sm_hdrs = \
   pmp.h \
+  iopmp.h \
   sm.h \
   enclave_args.h \
   enclave.h \
@@ -10,6 +11,7 @@ sm_hdrs = \
 sm_c_srcs = \
   ipi.c \
   pmp.c \
+  iopmp.c \
   platform/@TARGET_PLATFORM@/platform.c \
   sm.c \
   enclave.c \

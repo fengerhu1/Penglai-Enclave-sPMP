@@ -44,6 +44,7 @@ libsbi-objs-y += sbi_trap.o
 libsbi-objs-y += sbi_unpriv.o
 libsbi-objs-y += sbi_expected_trap.o
 libsbi-objs-y += sbi_pmp.o
+libsbi-objs-y += sbi_iopmp.o
 
 ## Add by Dong Du
 #  The Penglai related files here

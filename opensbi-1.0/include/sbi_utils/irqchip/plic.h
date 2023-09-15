@@ -11,6 +11,8 @@
 #define __IRQCHIP_PLIC_H__
 
 #include <sbi/sbi_types.h>
+#define sIOPMP_VIOLATION 1
+#define sIOPMP_DEVICE_SWITCHING 2
 
 struct plic_data {
 	unsigned long addr;
@@ -25,5 +27,9 @@ int plic_cold_irqchip_init(struct plic_data *plic);
 void plic_set_thresh(struct plic_data *plic, u32 cntxid, u32 val);
 
 void plic_set_ie(struct plic_data *plic, u32 cntxid, u32 word_index, u32 val);
+
+unsigned int PLIC_id_read(u32 cntxid);
+
+void PLIC_id_clr(unsigned int id, u32 cntxid);
 
 #endif

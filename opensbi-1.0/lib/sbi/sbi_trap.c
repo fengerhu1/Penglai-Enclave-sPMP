@@ -20,6 +20,9 @@
 #include <sbi/sbi_scratch.h>
 #include <sbi/sbi_timer.h>
 #include <sbi/sbi_trap.h>
+#include <sbi_utils/irqchip/plic.h>
+#include <sbi/sbi_iopmp.h>
+
 
 #include <sm/sm.h>
 
@@ -220,6 +223,8 @@ struct sbi_trap_regs *sbi_trap_handler(struct sbi_trap_regs *regs)
 	ulong mcause = csr_read(CSR_MCAUSE);
 	ulong mtval = csr_read(CSR_MTVAL), mtval2 = 0, mtinst = 0;
 	struct sbi_trap_info trap;
+	u32 hartid;
+	int interrupt_id;
 
 	if (misa_extension('H')) {
 		mtval2 = csr_read(CSR_MTVAL2);
@@ -240,7 +245,18 @@ struct sbi_trap_regs *sbi_trap_handler(struct sbi_trap_regs *regs)
 			sbi_ipi_process();
 			break;
 		default:
-			msg = "unhandled external interrupt";
+			hartid = current_hartid();
+			interrupt_id = PLIC_id_read(2*hartid);
+			if (interrupt_id == sIOPMP_VIOLATION) {
+				handle_sIOPMP_violation();
+			}
+			else if (interrupt_id == sIOPMP_DEVICE_SWITCHING) {
+				handle_cold_device_switching();
+			}
+			else {
+				msg = "unhandled external interrupt";
+			}
+			PLIC_id_clr(interrupt_id, 2*hartid);
 			goto trap_error;
 		};
 		return regs;

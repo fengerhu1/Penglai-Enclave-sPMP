@@ -352,6 +352,8 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
 	sbi_boot_print_hart(scratch, hartid);
 
 	sbi_printf("[Penglai] Penglai Enclave Preparing\n");
+	sbi_printf("OPENSBI MSTATUS %lx\n", csr_read(CSR_MSTATUS));
+	sbi_printf("OPENSBI MIE %lx\n", csr_read(CSR_MIE));
 
 	wake_coldboot_harts(scratch, hartid);
 
