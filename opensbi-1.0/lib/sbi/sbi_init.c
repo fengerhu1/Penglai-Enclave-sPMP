@@ -26,6 +26,7 @@
 #include <sbi/sbi_tlb.h>
 #include <sbi/sbi_pmp.h>
 #include <sbi/sbi_version.h>
+#include <sbi/sbi_iopmp.h>
 
 #define BANNER                                              \
 	"   ____                    _____ ____ _____\n"     \
@@ -354,6 +355,7 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
 	sbi_printf("[Penglai] Penglai Enclave Preparing\n");
 	sbi_printf("OPENSBI MSTATUS %lx\n", csr_read(CSR_MSTATUS));
 	sbi_printf("OPENSBI MIE %lx\n", csr_read(CSR_MIE));
+	sIOPMP_setup();
 
 	wake_coldboot_harts(scratch, hartid);
 

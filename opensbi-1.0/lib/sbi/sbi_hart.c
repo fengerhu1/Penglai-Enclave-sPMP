@@ -613,6 +613,7 @@ sbi_hart_switch_mode(unsigned long arg0, unsigned long arg1,
 	}
 
 	//Init Penglai SM here
+	sbi_printf("DEBUG: sm_init\n");
 	sm_init();
 
 	register unsigned long a0 asm("a0") = arg0;

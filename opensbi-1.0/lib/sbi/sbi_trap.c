@@ -255,9 +255,11 @@ struct sbi_trap_regs *sbi_trap_handler(struct sbi_trap_regs *regs)
 			}
 			else {
 				msg = "unhandled external interrupt";
+				PLIC_id_clr(interrupt_id, 2*hartid);
+				goto trap_error;
 			}
 			PLIC_id_clr(interrupt_id, 2*hartid);
-			goto trap_error;
+			break;
 		};
 		return regs;
 	}

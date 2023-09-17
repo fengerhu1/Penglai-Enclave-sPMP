@@ -1,3 +1,6 @@
+#include <stdint.h>
+#include <sbi/sbi_types.h>
+
 #define DMA_START 0x2000
 #define DMA_ADDR 0x2010
 #define DMA_SIZE 0x2030
@@ -33,6 +36,25 @@
 #define DEVICE_INT_IOPMP 0x10029870
 #define SIDDEVICE_IOPMP 0x10029874
 
+#define IOPMP_R				_UL(0x80)
+#define IOPMP_W				_UL(0x40)
+#define IOPMP_X				_UL(0x20)
+#define IOPMP_A				_UL(0x18) 
+#define IOPMP_A_TOR			_UL(0x08)
+#define IOPMP_A_NA4			_UL(0x10)
+#define IOPMP_A_NAPOT			_UL(0x18)
+#define IOPMP_L				_UL(0x1)
+
+struct iopmp_config_t
+{
+  uintptr_t paddr;
+  unsigned long size;
+  u8 perm;
+  u8 mode;
+};
+
 void handle_sIOPMP_violation();
 
 void handle_cold_device_switching();
+
+void sIOPMP_setup();
