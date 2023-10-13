@@ -615,6 +615,10 @@ sbi_hart_switch_mode(unsigned long arg0, unsigned long arg1,
 	//Init Penglai SM here
 	sbi_printf("DEBUG: sm_init\n");
 	sm_init();
+	sbi_printf("OPENSBI MSTATUS twice %lx\n", csr_read(CSR_MSTATUS));
+	sbi_printf("OPENSBI MIE twice %lx\n", csr_read(CSR_MIE));
+	sbi_printf("OPENSBI: MIDELEG twice %lx\n", csr_read(CSR_MIDELEG));
+	sbi_printf("OPENSBI: MTVEC twice %lx\n", csr_read(CSR_MTVEC));
 
 	register unsigned long a0 asm("a0") = arg0;
 	register unsigned long a1 asm("a1") = arg1;

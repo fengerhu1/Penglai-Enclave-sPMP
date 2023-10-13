@@ -352,15 +352,18 @@ static void __noreturn init_coldboot(struct sbi_scratch *scratch, u32 hartid)
 
 	sbi_boot_print_hart(scratch, hartid);
 
-	sbi_printf("[Penglai] Penglai Enclave Preparing\n");
-	sbi_printf("OPENSBI MSTATUS %lx\n", csr_read(CSR_MSTATUS));
-	sbi_printf("OPENSBI MIE %lx\n", csr_read(CSR_MIE));
-	sIOPMP_setup();
-
 	wake_coldboot_harts(scratch, hartid);
 
 	init_count = sbi_scratch_offset_ptr(scratch, init_count_offset);
 	(*init_count)++;
+
+	sbi_printf("[Penglai] Penglai Enclave Preparing\n");
+	sbi_printf("OPENSBI: MSTATUS %lx\n", csr_read(CSR_MSTATUS));
+	sbi_printf("OPENSBI: MIE %lx\n", csr_read(CSR_MIE));
+	sbi_printf("OPENSBI: MIDELEG %lx\n", csr_read(CSR_MIDELEG));
+	sbi_printf("OPENSBI: MTVEC %lx\n", csr_read(CSR_MTVEC));
+	sIOPMP_setup();
+	test_DMA();
 
 	sbi_hsm_prepare_next_jump(scratch, hartid);
 	sbi_hart_switch_mode(hartid, scratch->next_arg1, scratch->next_addr,

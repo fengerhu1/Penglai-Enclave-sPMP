@@ -249,9 +249,13 @@ struct sbi_trap_regs *sbi_trap_handler(struct sbi_trap_regs *regs)
 			interrupt_id = PLIC_id_read(2*hartid);
 			if (interrupt_id == sIOPMP_VIOLATION) {
 				handle_sIOPMP_violation();
+				// msg = "sIOPMP_violation";
+				// goto trap_error;
 			}
 			else if (interrupt_id == sIOPMP_DEVICE_SWITCHING) {
 				handle_cold_device_switching();
+				// msg = "cold_device_switching";
+				// goto trap_error;
 			}
 			else {
 				msg = "unhandled external interrupt";

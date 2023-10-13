@@ -11,8 +11,8 @@
 #define __IRQCHIP_PLIC_H__
 
 #include <sbi/sbi_types.h>
-#define sIOPMP_VIOLATION 1
-#define sIOPMP_DEVICE_SWITCHING 2
+#define sIOPMP_VIOLATION 3
+#define sIOPMP_DEVICE_SWITCHING 4
 
 struct plic_data {
 	unsigned long addr;

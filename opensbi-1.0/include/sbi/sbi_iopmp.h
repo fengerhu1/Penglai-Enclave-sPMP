@@ -36,6 +36,16 @@
 #define DEVICE_INT_IOPMP 0x10029870
 #define SIDDEVICE_IOPMP 0x10029874
 
+#define DUMMY_DMA_SID 0x10
+
+/*
+ * Bit 7: Read
+ * Bit 6: write
+ * Bit 5: execution
+ * Bit 4,3: Mode
+ * Bit 2,1: res
+ * Bit 0: Lock
+ */
 #define IOPMP_R				_UL(0x80)
 #define IOPMP_W				_UL(0x40)
 #define IOPMP_X				_UL(0x20)
@@ -58,3 +68,5 @@ void handle_sIOPMP_violation();
 void handle_cold_device_switching();
 
 void sIOPMP_setup();
+
+void test_DMA();
