@@ -212,7 +212,7 @@ void sIOPMP_setup() {
         set_SRCMD(i, SD0);
     }
     
-    // set the MD for dummy DMA (sid = 16)
+    // set the MD1 for dummy DMA (sid = 16)
     set_SRCMD(16, SD1);
 
     // Bind MD0 to the IOPMP0
@@ -220,7 +220,8 @@ void sIOPMP_setup() {
     sbi_printf("sIOPMP: set the MDCFG0 MD0: %x\n", MD0);
     // Bind the MD1 to the IOPMP1
     set_MDCFG(1, MD1);
-    // Bind the MD2~62 to the IOPMP2~31
+
+    // Bind the MD2~62 to the IOPMP2~31 (T=32), these domain will not be used in the initialization phase
     for (i=2; i<63; i++) {
         set_MDCFG(i, MD32);
     }
@@ -231,6 +232,7 @@ void sIOPMP_setup() {
 
     set_IOPMP(0, iopmp_cfg_t_0);
     set_IOPMP(1, iopmp_cfg_t_1);
+    // Following IOPMP entries will not be used in the initialization phase
     set_IOPMP(2, iopmp_cfg_t_1);
     set_IOPMP(3, iopmp_cfg_t_1);
     sbi_printf("sIOPMP: setup is finished\n");
@@ -242,10 +244,13 @@ void sIOPMP_setup() {
 
     // set the CAM table, map device id n to SID n
     // Ignore device id 4~15 to test the cold device switching
+    // SID 8 will be used for network
     for (i = 0; i<4; i++) {
         writel(0x00010001*i, (void *)SIDDEVICE_IOPMP);
     }
+
     // Map the device id (dummy DMA) 16 to the sid 16
+    // We test dummy DMA in the test_DMA function
     for (i = 16; i<17; i++) {
         writel(0x00010001*i, (void *)SIDDEVICE_IOPMP);
     }
