@@ -129,67 +129,6 @@ void set_IOPMP_CFG(int iopmp_index, u8 value) {
     writeb(value, (void *)IOPMP_CFD0 + iopmp_index);
 }
 
-// /*
-//  * SID: 64 (0~63)
-//  * MD: 63 (0~62)
-//  * IOPMP: 32 (0~31)
-//  * eSID MD: index 62, the last MD is used for eSID
-//  */
-// void sIOPMP_setup() {
-//     uint64_t SD0 = 0x00000001, SD1 = 0x00000001;
-//     uint32_t MD0 = 0x0001, MD1 = 0x0002;
-//     int i = 0;
-
-//     // uint8_t read_dma, start_dma = 0xFF;
-//     // uint32_t addr_iopmp = 0x89001FFFL;
-//     // uint32_t addr_dma = 0x88000000L;
-//     // uint16_t size_dma = 0x1000L;
-//     /*
-//      * Bit 7: Read
-//      * Bit 6: write
-//      * Bit 5: execution
-//      * Bit 4,3: Mode
-//      * Bit 2,1: res
-//      * Bit 0: Lock
-//      */
-
-//     // IOPMP entry has no permission
-//     // uint8_t CFG0 = 0x19, CFG1 = 0x19, CFG2 = 0x19, CFG3 = 0x19;
-
-//     // Bind the SID0 to the MD0
-//     sbi_printf("sIOPMP: sIOPMP setup\n");
-//     for (i=0; i<16; i++) {
-//         set_SRCMD(i, SD0);
-//     }
-
-//     // set the MD for dummy DMA (sid = 16)
-//     set_SRCMD(16, SD1);
-//     // Bind MD0 to the IOPMP0
-//     set_MDCFG(0, MD0);
-//     sbi_printf("sIOPMP: set the MDCFG0 MD0: %x\n", MD0);
-//     // Bind the MD1 to the IOPMP1
-//     set_MDCFG(1, MD1);
-
-//     // struct iopmp_config_t iopmp_cfg_t_0 = {.paddr = 0x80000000, .size = 0x40000000, .perm = IOPMP_L|IOPMP_R|IOPMP_W|IOPMP_X, .mode = IOPMP_A_NAPOT};
-//     struct iopmp_config_t iopmp_cfg_t_1 = {.paddr = 0x88000000L, .size = 0x4000, .perm = IOPMP_L, .mode = IOPMP_A_NAPOT};
-
-//     set_IOPMP(0, iopmp_cfg_t_1);
-//     set_IOPMP(1, iopmp_cfg_t_1);
-//     set_IOPMP(2, iopmp_cfg_t_1);
-//     set_IOPMP(3, iopmp_cfg_t_1);
-//     sbi_printf("sIOPMP: setup is finished\n");
-
-//     writel(0x0, (void *)STLEN_IOPMP);
-
-//     // set eSID to the hardware register, currently 17 is a invalid SID
-//     writel(17, (void *)VSTL_IOPMP);
-
-//     // set the CAM table, map device id n to SID n
-//     for (i = 0; i<17; i++) {
-//         writel(0x00010001*i, (void *)SIDDEVICE_IOPMP);
-//     }
-// }
-
 /*
  * SID: 64 (0~63)
  * MD: 63 (0~62)
@@ -198,7 +137,7 @@ void set_IOPMP_CFG(int iopmp_index, u8 value) {
  */
 void sIOPMP_setup() {
     uint64_t SD0 = 0x00000001, SD1 = 0x00000002;
-    uint32_t MD0 = 0x0001, MD1 = 0x0002, MD32 = 0x0020;
+    uint32_t MD0 = 0x0001, MD1 = 0x0002, MD256 = 256;
     int i = 0;
 
 
@@ -217,14 +156,15 @@ void sIOPMP_setup() {
 
     // Bind MD0 to the IOPMP0
     set_MDCFG(0, MD0);
-    sbi_printf("sIOPMP: set the MDCFG0 MD0: %x\n", MD0);
     // Bind the MD1 to the IOPMP1
     set_MDCFG(1, MD1);
 
-    // Bind the MD2~62 to the IOPMP2~31 (T=32), these domain will not be used in the initialization phase
+    // Bind the MD2~62 to the IOPMP2~255 (T=256), these domain will not be used in the initialization phase
     for (i=2; i<63; i++) {
-        set_MDCFG(i, MD32);
+        set_MDCFG(i, MD256);
     }
+
+    sbi_printf("sIOPMP: The number of isolated IO ranges is %d\n", MD256);
 
     /* TODO: the IOPMP protected size can not lager than 0x4000(?), otherwise, the IOPMP checker will be disable*/
     struct iopmp_config_t iopmp_cfg_t_0 = {.paddr = 0x80000000, .size = 0x40000000, .perm = IOPMP_L|IOPMP_R|IOPMP_W|IOPMP_X, .mode = IOPMP_A_NAPOT};
@@ -243,7 +183,7 @@ void sIOPMP_setup() {
     writel(17, (void *)VSTL_IOPMP);
 
     // set the CAM table, map device id n to SID n
-    // Ignore device id 4~15 to test the cold device switching
+    // Ignore device id 8 to test the cold device switching
     // SID 8 will be used for network
     for (i = 0; i<4; i++) {
         writel(0x00010001*i, (void *)SIDDEVICE_IOPMP);
@@ -254,6 +194,19 @@ void sIOPMP_setup() {
     for (i = 16; i<17; i++) {
         writel(0x00010001*i, (void *)SIDDEVICE_IOPMP);
     }
+
+    for (i = 17; i<64; i++) {
+        writel(0x00010001*i, (void *)SIDDEVICE_IOPMP);
+    }
+    // We only ignore the SID 8 for cold device switching
+    for (i = 4; i<8; i++) {
+        writel(0x00010001*i, (void *)SIDDEVICE_IOPMP);
+    }
+
+    for (i = 9; i<16; i++) {
+        writel(0x00010001*i, (void *)SIDDEVICE_IOPMP);
+    }
+
 }
 
 void test_DMA() {
